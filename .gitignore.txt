@@ -1,0 +1,15 @@
+# Fichiers compilés Java
+*.class
+
+# Dossiers d'environnement de développement (IDE)
+.vscode/
+.idea/
+*.iml
+out/
+bin/
+
+# Secrets et configuration locale (TRÈS IMPORTANT)
+.env
+config.local.properties
+*.key
+credentials.json

@@ -1,0 +1,445 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "server-alert",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1184,
+        32
+      ],
+      "id": "e3679d28-3985-430b-946e-aedac990b199",
+      "name": "Webhook",
+      "webhookId": "3001470e-8190-4ede-a0ac-54935e5d3fb7"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.ressource }}",
+                    "rightValue": "CPU",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b86e5a15-efd8-48ab-80da-bd67fbbd116f"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0fd3aebc-eac0-416f-b533-263f98ae9ad1",
+                    "leftValue": "={{ $json.body.ressource }}",
+                    "rightValue": "RAM",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "da760f6e-7d04-4cef-ae89-2f4f08dac58c",
+                    "leftValue": "={{ $json.body.ressource }}",
+                    "rightValue": "DISK",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -896,
+        16
+      ],
+      "id": "6a6a2af7-ae50-4072-81db-08ec1e4a7a51",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "fromEmail": "aaidoun11@gmail.com",
+        "toEmail": "aaidoun11@gmail.com",
+        "subject": "=Alerte {{ $('Switch').item.json.body.ressource }} sur {{ $('Switch').item.json.body.serveur }}\n",
+        "html": "={{ $json.output }}\n<br><br>\n--- Détails techniques ---<br>\nServeur : {{ $('Switch').item.json.body.serveur }}<br>\nRessource : {{ $('Switch').item.json.body.ressource }}<br>\nValeur : {{ $('Switch').item.json.body.valeur }}%<br>\nSeuil : {{ $('Switch').item.json.body.seuil }}%<br>\nHorodatage : {{ $('Switch').item.json.body.timestamp }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        16,
+        16
+      ],
+      "id": "86d272dd-f1e7-4267-82f7-4f31f2782e39",
+      "name": "Send an Email",
+      "webhookId": "f49822d0-35f2-4f04-9374-7b31639af579",
+      "credentials": {
+        "smtp": {
+          "id": "w4xxnsLgFVD6WrLT",
+          "name": "SMTP account"
+        }
+      },
+      "notes": "Cet outil envoie un email d'alerte à l'administrateur.\nTu DOIS fournir le texte de ton analyse dans le champ \"output\"."
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Alerte détectée :\nServeur : {{ $json.body.serveur }}\nRessource : {{ $json.body.ressource }}\nValeur : {{ $json.body.valeur }}%\nSeuil : {{ $json.body.seuil }}%",
+        "options": {
+          "systemMessage": "Tu es un assistant de monitoring. Tu dois générer un rapport TRÈS COURT et STRICTEMENT formaté.\n\nInterdiction d'ajouter des introductions, des questions, ou du bavardage.\n\nTu dois répondre UNIQUEMENT avec ce format exact (utilise des sauts de ligne) :\n\n🔴 GRAVITÉ : [Critique / Attention / Normal]\n📊 DIAGNOSTIC : [1 phrase maximum expliquant la cause]\n✅ ACTION : [1 seule action prioritaire]"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -496,
+        16
+      ],
+      "id": "a05b624d-32ad-4255-9881-7f70bb0cf02c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        304
+      ],
+      "id": "12465dff-2753-497e-a8ec-b796287ca5b2",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "cqVJaaFHmtkkqWtd",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "ServerMonitoringSession"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -544,
+        304
+      ],
+      "id": "7005cda5-ecb0-4a25-8b6f-77d5e311f9a5",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1heySi0UnYZ230Tq01O_cQRGhxK7YPSMAuF2_ckndoOE/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Feuille 1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Serveur",
+              "displayName": "Serveur",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ressource",
+              "displayName": "Ressource",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Valeur",
+              "displayName": "Valeur",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Seuil",
+              "displayName": "Seuil",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Diagnostic IA",
+              "displayName": "Diagnostic IA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        16,
+        272
+      ],
+      "id": "bbf27563-85a1-4782-937b-d039141dc449",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "r9lAa8hKblT9GFnQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5b44b4d2-e64b-4d53-babb-559ef877d71e",
+              "name": "Date",
+              "value": "={{ $('Switch').item.json.body.timestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "2f211c86-e3dc-4ba6-bab1-29a48b9f9a12",
+              "name": "Serveur",
+              "value": "={{ $('Switch').item.json.body.serveur }}",
+              "type": "string"
+            },
+            {
+              "id": "e92f3be0-6397-4a4a-9fab-0f172b1ead09",
+              "name": "Ressource",
+              "value": "={{ $('Switch').item.json.body.ressource }}",
+              "type": "string"
+            },
+            {
+              "id": "b24de00a-1fc2-46a2-b28c-22e920a8c1bb",
+              "name": "Valeur",
+              "value": "={{ $('Switch').item.json.body.valeur }}",
+              "type": "string"
+            },
+            {
+              "id": "04514894-301e-408b-a67c-e6d46b70ba29",
+              "name": "Seuil",
+              "value": "={{ $('Switch').item.json.body.seuil }}",
+              "type": "string"
+            },
+            {
+              "id": "06d2a85f-f3a1-451f-824c-4a59102d6f40",
+              "name": "Diagnostic IA",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -208,
+        272
+      ],
+      "id": "21ae27e7-9c0e-4884-ab8d-aa7d94642cdf",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Email": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ceb2ac08-de8f-4a47-ae26-25767e6c5856",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1707280b9e3031ee38978589fd8be7d26f560103cda859da0d1e9df51917bcf2"
+  },
+  "nodeGroups": [],
+  "id": "emXn2SONGKsnjBdw",
+  "tags": []
+}
