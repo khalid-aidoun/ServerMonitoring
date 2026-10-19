@@ -1,25 +1,58 @@
-# Moniteur de Ressources Serveur — Java
+# 🖥️ ServerMonitoring — Système de supervision intelligent
 
-Système de surveillance des ressources serveur (CPU, RAM, Disque) avec envoi d'alertes via Webhook n8n.
+![Java](https://img.shields.io/badge/Java-11%2B-orange?style=flat-square&logo=java)
+![n8n](https://img.shields.io/badge/n8n-workflow-red?style=flat-square)
+![Groq](https://img.shields.io/badge/AI-Groq-blueviolet?style=flat-square)
+![GitHub](https://img.shields.io/badge/GitHub-Repo-black?style=flat-square&logo=github)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+
+Système de surveillance des ressources serveur (CPU, RAM, Disque) avec envoi d'alertes intelligentes via **n8n**, analyse par **intelligence artificielle (Groq)** et historisation dans **Google Sheets**.
 
 ---
 
+## 📋 Table des matières
+
+- [Architecture](#-architecture)
+- [Fonctionnalités](#-fonctionnalités)
+- [Structure du projet](#-structure-du-projet)
+- [Configuration rapide](#-configuration-rapide)
+- [Compilation et exécution](#-compilation-et-exécution)
+- [Workflow n8n](#-workflow-n8n)
+- [Exemple de sortie](#-exemple-de-sortie)
+- [Technologies utilisées](#-technologies-utilisées)
+- [Auteur](#-auteur)
+- [Licence](#-licence)
+
+---
+
+## 🏗️ Architecture
+
+```text
+┌─────────────────┐      HTTP POST       ┌──────────────┐      SMTP      ┌────────┐
+│   Java (PC)     │ ───────────────────► │     n8n      │ ─────────────► │ Gmail  │
+│  ServerMonitor  │      JSON            │  Workflow    │    Email       │ Boîte  │
+└─────────────────┘                      └──────────────┘                └────────┘
+                                                │
+                                                ▼
+                                         ┌──────────────┐
+                                         │ Google Sheets│
+                                         │  (historique)│
+                                         └──────────────┘
 ## Structure du projet
-
-```
 ServerMonitoring/
-├── src/
-│   ├── Main.java              ← Point d'entrée — configurez l'URL du Webhook ici
-│   ├── ServerMonitor.java     ← Boucle principale de surveillance
-│   ├── ResourceCollector.java ← Lecture CPU / RAM / Disque
-│   ├── ResourceAnalyzer.java  ← Seuils d'alerte (modifiables ici)
-│   ├── Alert.java             ← Modèle de données + conversion JSON
-│   ├── AlertManager.java      ← Déduplication des alertes
-│   └── N8nClient.java         ← Envoi HTTP POST vers n8n
-└── README.md
-```
-
----
+├── src/                          # Code source Java (7 classes)
+│   ├── Main.java                 # Point d'entrée
+│   ├── ServerMonitor.java        # Boucle de surveillance
+│   ├── ResourceCollector.java    # Lecture CPU/RAM/Disque
+│   ├── ResourceAnalyzer.java     # Analyse des seuils
+│   ├── Alert.java                # Modèle de données + JSON
+│   ├── AlertManager.java         # Déduplication
+│   └── N8nClient.java            # Client HTTP vers n8n
+├── n8n/
+│   ├── workflow.json             # Export du workflow n8n
+│   └── workflow_schema.png       # Schéma visuel
+├── .gitignore                    # Fichiers ignorés par Git
+└── README.md                     # Documentation
 
 ## Configuration rapide
 
